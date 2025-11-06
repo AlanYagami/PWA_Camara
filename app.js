@@ -3,6 +3,7 @@ const openCameraBtn = document.getElementById('openCamera');
 const cameraContainer = document.getElementById('cameraContainer');
 const video = document.getElementById('video');
 const takePhotoBtn = document.getElementById('takePhoto');
+const switchCameraBtn = document.getElementById('switchCamera');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const photosGallery = document.getElementById('photosGallery');
@@ -11,6 +12,7 @@ const photosContainer = document.getElementById('photosContainer');
 // Variable global para almacenar el MediaStream
 let stream = null;
 let photoCount = 0;
+let currentFacingMode = 'environment'; // 'environment' = trasera, 'user' = frontal
 
 // Detectar orientación del dispositivo
 function getVideoConstraints() {
@@ -18,13 +20,13 @@ function getVideoConstraints() {
     
     if (isMobile) {
         return {
-            facingMode: { ideal: 'environment' },
+            facingMode: { ideal: currentFacingMode },
             width: { ideal: 720 },
             height: { ideal: 1280 }
         };
     } else {
         return {
-            facingMode: { ideal: 'environment' },
+            facingMode: { ideal: currentFacingMode },
             width: { ideal: 1280 },
             height: { ideal: 720 }
         };
@@ -129,9 +131,24 @@ function closeCamera() {
     }
 }
 
+// Función para cambiar entre cámara frontal y trasera
+async function switchCamera() {
+    // Cambiar el modo de cámara
+    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+    
+    // Cerrar la cámara actual
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Abrir la cámara con el nuevo modo
+    await openCamera();
+}
+
 // Event Listeners
 openCameraBtn.addEventListener('click', openCamera);
 takePhotoBtn.addEventListener('click', takePhoto);
+switchCameraBtn.addEventListener('click', switchCamera);
 
 // Limpiar stream cuando el usuario cierra la página
 window.addEventListener('beforeunload', () => {
