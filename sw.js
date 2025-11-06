@@ -1,73 +1,60 @@
 // Configuración del Service Worker
-const CACHE_NAME = 'camara-pwa-v1';
+const CACHE_NAME = 'camara-pwa-v2';
 
-// Lista de archivos a guardar en caché
+// Lista de archivos a guardar en caché (rutas relativas)
 const urlsToCache = [
-    '/PWA_Camara/',
-    '/PWA_Camara/index.html',
-    '/PWA_Camara/app.js',
-    '/PWA_Camara/manifest.json',
-    '/PWA_Camara/icon-192.png',
-    '/PWA_Camara/icon-512.png'
+    './',
+    './index.html',
+    './app.js',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png'
 ];
 
-// Evento INSTALL - Almacenamiento inicial
-self.addEventListener('install', function(event) {
+// INSTALL - Guardar archivos en caché
+self.addEventListener('install', event => {
     console.log('Service Worker: Instalando...');
-    
+
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(function(cache) {
+            .then(cache => {
                 console.log('Cache abierto:', CACHE_NAME);
                 return cache.addAll(urlsToCache);
             })
-            .then(function() {
-                console.log('Archivos cacheados correctamente');
-            })
-            .catch(function(error) {
-                console.error('Error al cachear archivos:', error);
-            })
+            .then(() => console.log('Archivos cacheados correctamente'))
+            .catch(err => console.error('Error al cachear:', err))
     );
 });
 
-// Evento FETCH - Estrategia Cache First
-self.addEventListener('fetch', function(event) {
+// FETCH - Prioridad a caché, luego a red
+self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                if (response) {
-                    console.log('Sirviendo desde caché:', event.request.url);
-                    return response;
-                }
-                
-                console.log('Obteniendo desde red:', event.request.url);
-                return fetch(event.request);
-            })
-            .catch(function(error) {
-                console.error('Error en fetch:', error);
-            })
+        caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+                console.log('Desde caché:', event.request.url);
+                return cachedResponse;
+            }
+            console.log('Desde red:', event.request.url);
+            return fetch(event.request);
+        })
     );
 });
 
-// Evento ACTIVATE - Limpieza de cachés antiguos
-self.addEventListener('activate', function(event) {
+// ACTIVATE - Eliminar cachés viejos
+self.addEventListener('activate', event => {
     console.log('Service Worker: Activando...');
-    
+
     event.waitUntil(
-        caches.keys().then(function(cacheNames) {
+        caches.keys().then(cacheNames => {
             return Promise.all(
-                cacheNames.map(function(cacheName) {
+                cacheNames.map(cacheName => {
                     if (cacheName !== CACHE_NAME) {
-                        console.log('Eliminando caché antiguo:', cacheName);
+                        console.log('Eliminando caché viejo:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        })
-        .then(function() {
-            console.log('Service Worker activado correctamente');
-            return self.clients.claim();
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
