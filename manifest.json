@@ -2,7 +2,7 @@
   "name": "Cámara PWA",
   "short_name": "CamaraPWA",
   "description": "Aplicación web progresiva para capturar fotos con la cámara del dispositivo. Funciona sin conexión y puede instalarse en tu pantalla de inicio.",
-  "start_url": "./",
+  "start_url": "/PWA_Camara/",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
