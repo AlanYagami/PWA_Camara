@@ -3,10 +3,12 @@ const CACHE_NAME = 'camara-pwa-v1';
 
 // Lista de archivos a guardar en caché
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/app.js',
-    '/manifest.json'
+    '/PWA_Camara/',
+    '/PWA_Camara/index.html',
+    '/PWA_Camara/app.js',
+    '/PWA_Camara/manifest.json',
+    '/PWA_Camara/icon-192.png',
+    '/PWA_Camara/icon-512.png'
 ];
 
 // Evento INSTALL - Almacenamiento inicial
